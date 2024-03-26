@@ -54,4 +54,11 @@ a {
 
 .logo-pic {
   max-width: 45%;
+}
+
+.btn-outline-primary {
+  color: blue;
+}
+.btn-outline-primary:hover {
+  background-color: blue;
 }/*# sourceMappingURL=style.css.map */
