@@ -59,4 +59,22 @@ a {
 }
 .btn-outline-primary:hover {
   background-color: blue;
+}
+
+tr {
+  cursor: pointer;
+}
+tr:hover {
+  background-color: aqua !important;
+}
+tr:hover a {
+  color: blue;
+}
+
+.fa-stack {
+  font-size: small !important;
+}
+
+.fade {
+  background-color: rgba(135, 135, 135, 0.3960784314) !important;
 }/*# sourceMappingURL=style.css.map */

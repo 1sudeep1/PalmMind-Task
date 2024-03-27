@@ -63,3 +63,21 @@ a {
     }
 }
 
+tr{
+    cursor: pointer;
+    &:hover{
+        background-color: aqua !important;
+        a{
+            color: blue;
+        }
+    }
+}
+
+
+.fa-stack{
+    font-size: small !important;
+}
+
+.fade{
+    background-color: #87878765 !important;
+}
