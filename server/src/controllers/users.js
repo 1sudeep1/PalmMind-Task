@@ -5,6 +5,8 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+const jwt = require('jsonwebtoken');
+
 // Controller function for user registration
 const registerUser = async (req, res) => {
     try {
@@ -42,7 +44,11 @@ const loginUser = async (req, res) => {
             const matched = await bcrypt.compare(password, userDetails.password);
 
             if (matched) {
-                res.status(200).json({ msg: 'logged in successfully' })
+                const token = jwt.sign(
+                    { email: userDetails.email },
+                    process?.env.SECRET_KEY
+                  );
+                res.status(200).json({ msg: 'logged in successfully', token })
             } else {
                 res.status(401).json({ msg: 'incorrect password' })
             }

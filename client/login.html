@@ -245,6 +245,7 @@
         })
           .then(function (response) {
             if (response.status === 200) {
+              console.log(response.data.token)
               document.getElementById("loginResponse").innerText = "✅ " + response.data.msg;
               document.getElementById("toast").classList.add("show")
               setTimeout(function () {

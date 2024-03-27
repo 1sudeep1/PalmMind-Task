@@ -219,12 +219,18 @@
           const nameLink = document.createElement("a");
           nameLink.href = "#";
           nameLink.textContent = user.fullName;
+          nameLink.addEventListener("click", function(){
+            displayUserDetails(user)
+          })
           nameTd.appendChild(nameLink);
 
           const emailTd = document.createElement("td");
           const emailLink = document.createElement("a");
           emailLink.href = "#";
           emailLink.textContent = user.email;
+          emailLink.addEventListener("click", function(){
+            displayUserDetails(user)
+          })
           emailTd.appendChild(emailLink);
 
           const actionsTd = document.createElement("td");
@@ -232,12 +238,12 @@
           const editLink = createTableLink("fa-pencil");
           const deleteLink = createTableLink("fa-trash-o");
           actionsTd.append(searchLink, editLink, deleteLink);
+          searchLink.addEventListener("click", function(){
+            displayUserDetails(user)
+          })
 
           tr.append(nameTd, emailTd, actionsTd);
           tbody.appendChild(tr);
-          tr.addEventListener("click", function(){
-            displayUserDetails(user)
-          })
         });
       }
 
