@@ -51,6 +51,13 @@
 
   <!-- display userlist section start -->
   <div class="container">
+    <div class="d-flex justify-content-center">
+      <div class="toast" id="toast">
+        <div class="toast-body">
+          <span id="deleteResponse"></span>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-lg-12">
         <div class="main-box clearfix">
@@ -219,7 +226,7 @@
           const nameLink = document.createElement("a");
           nameLink.href = "#";
           nameLink.textContent = user.fullName;
-          nameLink.addEventListener("click", function(){
+          nameLink.addEventListener("click", function () {
             displayUserDetails(user)
           })
           nameTd.appendChild(nameLink);
@@ -228,7 +235,7 @@
           const emailLink = document.createElement("a");
           emailLink.href = "#";
           emailLink.textContent = user.email;
-          emailLink.addEventListener("click", function(){
+          emailLink.addEventListener("click", function () {
             displayUserDetails(user)
           })
           emailTd.appendChild(emailLink);
@@ -238,16 +245,20 @@
           const editLink = createTableLink("fa-pencil");
           const deleteLink = createTableLink("fa-trash-o");
           actionsTd.append(searchLink, editLink, deleteLink);
-          searchLink.addEventListener("click", function(){
+          searchLink.addEventListener("click", function () {
             displayUserDetails(user)
           })
+          deleteLink.addEventListener("click", function () {
+            handleDeleteUser(user)
+          })
+
 
           tr.append(nameTd, emailTd, actionsTd);
           tbody.appendChild(tr);
         });
       }
 
-    //this function will set class to icon
+      //this function will set class to icon
       function createTableLink(iconClass) {
         const link = document.createElement("a");
         link.href = "#";
@@ -268,16 +279,33 @@
         return link;
       }
 
-    //this function will set value to modal
+      //this function will set value to modal
       function displayUserDetails(user) {
-            const modalTitle = document.querySelector("#exampleModalLabel");
-            modalTitle.textContent = user.fullName;
+        const modalTitle = document.querySelector("#exampleModalLabel");
+        modalTitle.textContent = user.fullName;
 
-            const modalBody = document.querySelector(".modal-body");
-            modalBody.innerHTML = `<img src="./images/avatar.jpg" alt="profile pic" class="img-fluid w-25" /><p><strong>Name:</strong> ${user.fullName}</p> <p><strong>Email:</strong> ${user.email}</p>`;
-            const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
-            modal.show();
-        }
+        const modalBody = document.querySelector(".modal-body");
+        modalBody.innerHTML = `<img src="./images/avatar.jpg" alt="profile pic" class="img-fluid w-25" /><p><strong>Name:</strong> ${user.fullName}</p> <p><strong>Email:</strong> ${user.email}</p>`;
+        const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+        modal.show();
+      }
+
+      //this function will delete the user
+      function handleDeleteUser(user) {
+        console.log(user._id)
+        axios.delete(`http://localhost:5000/delete-user/${user._id}`)
+          .then(function (response) {
+            if (response.status === 200) {
+              document.getElementById("deleteResponse").innerText = "✅ " + response.data.msg;
+              document.getElementById("toast").classList.add("show")
+              setTimeout(function () {
+                document.getElementById("toast").classList.remove('show')
+              }, 3000)
+              // Call fetchAllUsers after successful deletion
+              fetchAllUsers();
+            }
+          })
+      }
 
       // Fetch users when the page loads
       fetchAllUsers();
