@@ -86,7 +86,7 @@ const resetPassword = async (req, res) => {
                 await userDetails.save();
 
                 // Send a success response
-                res.status(200).json({ msg: "Password reset successfully" });
+                res.status(200).json({ msg: "new password created successfully" });
             }
 
         }
@@ -146,25 +146,6 @@ const verifyEmail = async (req, res) => {
     }
 }
 
-//controller function to reset code
-const verifyResetCode = async (req, res) => {
-    try {
-        const { resetCode } = req.body;
-
-        // Find the user by email
-        const codeDetails = await User.findOne({ resetCode: resetCode });
-        if (!codeDetails) {
-            return res.status(404).json({ msg: "Wrong code" });
-        } else {
-            return res.status(200).json({ msg: "code matched" });
-        }
-
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({ msg: "Password reset failed" });
-    }
-}
-
 
 //controller function to get all users
 const getAllUsers = async (req, res) => {
@@ -178,4 +159,4 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-module.exports = { registerUser, loginUser, resetPassword, getAllUsers, verifyEmail, verifyResetCode };
+module.exports = { registerUser, loginUser, resetPassword, getAllUsers, verifyEmail };
