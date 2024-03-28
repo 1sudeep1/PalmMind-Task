@@ -7,6 +7,9 @@ const saltRounds = 10;
 
 const jwt = require('jsonwebtoken');
 
+//Importing nodemailer
+const nodemailer = require('nodemailer');
+
 // Controller function for user registration
 const registerUser = async (req, res) => {
     try {
@@ -47,7 +50,7 @@ const loginUser = async (req, res) => {
                 const token = jwt.sign(
                     { email: userDetails.email },
                     process?.env.SECRET_KEY
-                  );
+                );
                 res.status(200).json({ msg: 'logged in successfully', token })
             } else {
                 res.status(401).json({ msg: 'incorrect password' })
@@ -65,14 +68,14 @@ const loginUser = async (req, res) => {
 //controllers for reset password
 const resetPassword = async (req, res) => {
     try {
-        const { email, newPassword, confirmNewPassword } = req.body;
+        const {resetCode, newPassword, confirmNewPassword } = req.body;
 
         // Check if newPassword and confirmPassword match
         if (newPassword !== confirmNewPassword) {
             return res.status(400).json({ msg: "Passwords do not match" });
         } else {
             // Find the user by email
-            const userDetails = await User.findOne({ email: email });
+            const userDetails = await User.findOne({ resetCode: resetCode });
             if (!userDetails) {
                 return res.status(404).json({ msg: "User not found" });
             } else {
@@ -94,6 +97,76 @@ const resetPassword = async (req, res) => {
     }
 }
 
+//controllers for verify email
+
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Use `true` for port 465, `false` for all other ports
+    auth: {
+        user: "isudp.th@gmail.com",
+        pass: "bczw jrph rgit cqyu",
+    },
+});
+
+const verifyEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Find the user by email
+        const userDetails = await User.findOne({ email: email });
+        if (!userDetails) {
+            return res.status(404).json({ msg: "User not found" });
+        } else {
+            // Generate a random reset code (you may want to use a more secure method)
+            const resetCode = Math.random().toString(36).substr(2, 8);
+
+            // Update the user document in the database with the reset code
+            userDetails.resetCode = resetCode;
+            await userDetails.save();
+
+            // Send an email with the reset code
+            const emailRes = await transporter.sendMail({
+                from: 'isudp.th@gmail.com', // sender address
+                to: email, // list of receivers
+                subject: "Password Reset Code", // Subject line
+                text: `Your password reset code is: ${resetCode}`,
+            });
+
+            if (emailRes) {
+                return res.status(200).json({ msg: "Reset code sent successfully" })
+            } else {
+                return res.status(500).json({ msg: "Failed to send reset code" });
+            }
+        }
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: "Password reset failed" });
+    }
+}
+
+//controller function to reset code
+const verifyResetCode = async (req, res) => {
+    try {
+        const { resetCode } = req.body;
+
+        // Find the user by email
+        const codeDetails = await User.findOne({ resetCode: resetCode });
+        if (!codeDetails) {
+            return res.status(404).json({ msg: "Wrong code" });
+        } else {
+            return res.status(200).json({ msg: "code matched" });
+        }
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: "Password reset failed" });
+    }
+}
+
+
+//controller function to get all users
 const getAllUsers = async (req, res) => {
     try {
         const allUsers = await User.find()
@@ -105,4 +178,4 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-module.exports = { registerUser, loginUser, resetPassword, getAllUsers };
+module.exports = { registerUser, loginUser, resetPassword, getAllUsers, verifyEmail, verifyResetCode };
