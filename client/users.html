@@ -99,20 +99,21 @@
                           <div class="d-flex flex-row align-items-center mb-4">
                             <i class="fas fa-user fa-lg me-3 fa-fw"></i>
                             <div class="form-outline flex-fill mb-0 text-start">
-                              <label class="form-label" for="fullName">Full Name</label><span
-                                class="ms-1 text-danger">*</span>
-                              <input type="text" id="fullName" class="form-control" placeholder="enter your full name" />
+                              <label class="form-label" for="fullName">Full Name</label>
+                              <input type="text" id="fullName" class="form-control"
+                                placeholder="enter your full name" />
                             </div>
                           </div>
-      
+
                           <div class="d-flex flex-row align-items-center mb-4">
                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
                             <div class="form-outline flex-fill mb-0 text-start">
-                              <label class="form-label" for="email">Your Email</label><span class="ms-1 text-danger">*</span>
-                              <input type="email" id="email" class="form-control" placeholder="enter your valid email" />
+                              <label class="form-label" for="email">Your Email</label>
+                              <input type="email" id="email" class="form-control"
+                                placeholder="enter your valid email" />
                             </div>
                           </div>
-      
+
                           <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                             <button id="updateButton" type="button" class="btn btn-primary btn-md">Update</button>
                           </div>
@@ -123,6 +124,11 @@
                 </div>
               </tbody>
             </table>
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center" id="pagination">
+                <!-- Pagination links will be dynamically added here -->
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
@@ -241,6 +247,7 @@
   <script src="https://cdn.jsdelivr.net/npm/react-hot-toast@2.4.1/dist/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="./js/users.js"></script>
+
 </body>
 
 </html>

@@ -53,52 +53,63 @@
 // })
 
 //By using jquery
-$("#registerButton").click(function () {
-  // Getting form data
-  const fullName = $("#fullName").val();
-  const email = $("#email").val();
-  const password = $("#password").val();
-  const confirmPassword = $("#confirmPassword").val();
+$(document).ready(function () {
+  $("#registerButton").click(function () {
+    // Getting form data
+    const fullName = $("#fullName").val();
+    const email = $("#email").val();
+    const password = $("#password").val();
+    const confirmPassword = $("#confirmPassword").val();
 
-  // Performing form validation
-  if (!fullName || !email || !password || !confirmPassword) {
-    $("#registrationResponse").text("❌ Please fill all the fields");
-    $("#toast").addClass("show");
-    setTimeout(function () {
-      $("#toast").removeClass('show');
-    }, 3000);
-  }
-
-  if (password !== confirmPassword) {
-    $("#registrationResponse").text("❌ Passwords do not match");
-    $("#toast").addClass("show");
-    setTimeout(function () {
-      $("#toast").removeClass('show');
-    }, 3000);
-  } else {
-    // Sending field data to server using Axios
-    axios.post("http://localhost:5000/register", {
-      fullName: fullName,
-      email: email,
-      password: password
-    })
-    .then(function (response) {
-      // Handle successful registration
-      console.log(response.data.msg);
-      $("#registrationResponse").text("✅ " + response.data.msg);
-      $("#toast").addClass('show');
+    // Performing form validation
+    if (!fullName || !email || !password || !confirmPassword) {
+      $("#registrationResponse").text("❌ Please fill all the fields");
+      $("#toast").addClass("show");
       setTimeout(function () {
         $("#toast").removeClass('show');
-        setTimeout(function () {
-          window.location.assign("login.html");
-        }, 1000);
-      }, 1000);
-    })
-    .catch(function (error) {
-      // Handle registration error
-      console.error(error);
-    });
-  }
-});
+      }, 3000);
+    }
+
+    if (password !== confirmPassword) {
+      $("#registrationResponse").text("❌ Passwords do not match");
+      $("#toast").addClass("show");
+      setTimeout(function () {
+        $("#toast").removeClass('show');
+      }, 3000);
+    } else {
+      // Sending field data to server using Axios
+      axios.post("http://localhost:5000/register", {
+        fullName: fullName,
+        email: email,
+        password: password
+      })
+        .then(function (response) {
+          // Handle successful registration
+          console.log(response.data.msg);
+          $("#registrationResponse").text("✅ " + response.data.msg);
+          $("#toast").addClass('show');
+          setTimeout(function () {
+            $("#toast").removeClass('show');
+            setTimeout(function () {
+              window.location.assign("login.html");
+            }, 1000);
+          }, 1000);
+        })
+        .catch(function (error) {
+          // Handle registration error
+          console.error(error);
+        });
+    }
+  });
+
+  // nav will fixed with animation after scrolling
+  $(window).scroll(function () {
+    if ($(this).scrollTop() > 100) {
+      $('nav').addClass('navFixedAnim')
+    } else {
+      $('nav').removeClass('navFixedAnim')
+    }
+  })
+})
 
 

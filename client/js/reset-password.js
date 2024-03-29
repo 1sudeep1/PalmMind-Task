@@ -50,54 +50,64 @@
 // })
 
 //using jquery
+$(document).ready(function () {
+    $("#createNewPassword").click(function () {
+        // Getting form data
+        const resetCode = $("#resetCode").val();
+        const newPassword = $("#newPassword").val();
+        const confirmNewPassword = $("#confirmNewPassword").val();
 
-$("#createNewPassword").click(function () {
-    // Getting form data
-    const resetCode = $("#resetCode").val();
-    const newPassword = $("#newPassword").val();
-    const confirmNewPassword = $("#confirmNewPassword").val();
-    
-    // Performing form validation
-    if (!resetCode || !newPassword || !confirmNewPassword) {
-        $("#verifyResponse").text("❌ Please fill all the fields");
-        $("#toast").addClass("show");
-        setTimeout(function () {
-            $("#toast").removeClass('show');
-        }, 3000);
-    } else {
-        // Sending reset password data to server using Axios
-        axios.post("http://localhost:5000/reset-password", {
-            resetCode: resetCode,
-            newPassword: newPassword,
-            confirmNewPassword: confirmNewPassword
-        })
-        .then(function (response) {
-            console.log(response.status);
-            if (response.status === 200) {
-                $("#resetResponse").text("✅ " + response.data.msg + ". Please login");
-                $("#toast").addClass("show");
-                setTimeout(function () {
-                    $("#toast").removeClass('show');
-                    setTimeout(function () {
-                        window.location.assign("login.html");
-                    }, 1000);
-                }, 3000);
-            }
-        })
-        .catch(function (error) {
-            if (error.response.status === 404) {
-                $("#resetResponse").text("❌ " + error.response.data.msg);
-                $("#toast").addClass("show");
-                setTimeout(function () {
-                    $("#toast").removeClass('show');
-                }, 3000);
-            } else {
-                $("#resetResponse").text("❌ " + error.response.data.msg);
-                $("#toast").addClass("show");
-                setTimeout(function () {
-                    $("#toast").removeClass('show');
-                }, 3000);
-            }
-        });
-    }
-});
+        // Performing form validation
+        if (!resetCode || !newPassword || !confirmNewPassword) {
+            $("#verifyResponse").text("❌ Please fill all the fields");
+            $("#toast").addClass("show");
+            setTimeout(function () {
+                $("#toast").removeClass('show');
+            }, 3000);
+        } else {
+            // Sending reset password data to server using Axios
+            axios.post("http://localhost:5000/reset-password", {
+                resetCode: resetCode,
+                newPassword: newPassword,
+                confirmNewPassword: confirmNewPassword
+            })
+                .then(function (response) {
+                    console.log(response.status);
+                    if (response.status === 200) {
+                        $("#resetResponse").text("✅ " + response.data.msg + ". Please login");
+                        $("#toast").addClass("show");
+                        setTimeout(function () {
+                            $("#toast").removeClass('show');
+                            setTimeout(function () {
+                                window.location.assign("login.html");
+                            }, 1000);
+                        }, 3000);
+                    }
+                })
+                .catch(function (error) {
+                    if (error.response.status === 404) {
+                        $("#resetResponse").text("❌ " + error.response.data.msg);
+                        $("#toast").addClass("show");
+                        setTimeout(function () {
+                            $("#toast").removeClass('show');
+                        }, 3000);
+                    } else {
+                        $("#resetResponse").text("❌ " + error.response.data.msg);
+                        $("#toast").addClass("show");
+                        setTimeout(function () {
+                            $("#toast").removeClass('show');
+                        }, 3000);
+                    }
+                });
+        }
+    });
+    // nav will fixed with animation after scrolling
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 100) {
+            $('nav').addClass('navFixedAnim')
+        } else {
+            $('nav').removeClass('navFixedAnim')
+        }
+    })
+})
+

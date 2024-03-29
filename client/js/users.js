@@ -97,7 +97,7 @@
 //     document.getElementById("email").value=user.email
 //     const modal = new bootstrap.Modal(document.getElementById('exampleModal1'));
 //     modal.show();
-  
+
 
 //   //function to handle edit user
 //   document.getElementById("updateButton").addEventListener("click", function(){
@@ -155,119 +155,175 @@
 // });
 
 //using jquery
-
 $(document).ready(function () {
-  function fetchAllUsers() {
-      axios.get('http://localhost:5000/users')
-          .then(response => {
-              displayUsers(response.data.allUsers);
-          })
-          .catch(error => {
-              console.log(error);
-          });
-  }
+    let currentPage = 1;
+    function fetchAllUsers(page = 1) {
+        axios.get(`http://localhost:5000/users?page=${page}`)
+            .then(response => {
+                displayUsers(response.data.allUsers);
+                updatePagination(page, response.data.count);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
 
-  function displayUsers(users) {
-      const tbody = $("#userTableBody");
-      tbody.empty();
+    //function to display users in table
+    function displayUsers(users) {
+        const tbody = $("#userTableBody");
+        tbody.empty();
 
-      users.forEach(user => {
-          const tr = $("<tr></tr>");
-          const nameTd = $("<td></td>");
-          const nameLink = $("<a></a>").attr("href", "#").text(user.fullName);
-          nameLink.click(() => displayUserDetails(user));
-          nameTd.append(nameLink);
+        users.forEach(user => {
+            const tr = $("<tr></tr>");
+            const nameTd = $("<td></td>");
+            const nameLink = $("<a></a>").attr("href", "#").text(user.fullName);
+            nameLink.click(() => displayUserDetails(user));
+            nameTd.append(nameLink);
 
-          const emailTd = $("<td></td>");
-          const emailLink = $("<a></a>").attr("href", "#").text(user.email);
-          emailLink.click(() => displayUserDetails(user));
-          emailTd.append(emailLink);
+            const emailTd = $("<td></td>");
+            const emailLink = $("<a></a>").attr("href", "#").text(user.email);
+            emailLink.click(() => displayUserDetails(user));
+            emailTd.append(emailLink);
 
-          const actionsTd = $("<td></td>");
-          const searchLink = createTableLink("fa-search-plus");
-          const editLink = createTableLink("fa-pencil");
-          const deleteLink = createTableLink("fa-trash-o");
-          actionsTd.append(searchLink, editLink, deleteLink);
-          searchLink.click(() => displayUserDetails(user));
-          editLink.click(() => handleEditModal(user));
-          deleteLink.click(() => handleDeleteUser(user));
+            const actionsTd = $("<td></td>");
+            const searchLink = createTableLink("fa-search-plus");
+            const editLink = createTableLink("fa-pencil");
+            const deleteLink = createTableLink("fa-trash-o");
+            actionsTd.append(searchLink, editLink, deleteLink);
+            searchLink.click(() => displayUserDetails(user));
+            editLink.click(() => handleEditModal(user));
+            deleteLink.click(() => handleDeleteUser(user));
 
-          tr.append(nameTd, emailTd, actionsTd);
-          tbody.append(tr);
-      });
-  }
+            tr.append(nameTd, emailTd, actionsTd);
+            tbody.append(tr);
+        });
+    }
 
-  function createTableLink(iconClass) {
-      const link = $("<a></a>").attr("href", "#").addClass("table-link");
-      const span = $("<span></span>").addClass("fa-stack");
-      const squareIcon = $("<i></i>").addClass("fa fa-square fa-stack-2x");
-      const actionIcon = $("<i></i>").addClass(`fa ${iconClass} fa-stack-1x fa-inverse`);
-      span.append(squareIcon, actionIcon);
-      link.append(span);
-      return link;
-  }
+    //function to update pagination
 
-  function displayUserDetails(user) {
-      const modalTitle = $("#exampleModalLabel");
-      modalTitle.text(user.fullName);
+    function updatePagination(currentPage, totalCount) {
+        // Update pagination links dynamically based on total count and current page
+        const totalPages = Math.ceil(totalCount / 5); // Assuming 10 users per page
+        let paginationHtml = '';
 
-      const modalBody = $(".modal-body");
-      modalBody.html(`<img src="./images/avatar.jpg" alt="profile pic" class="img-fluid w-25" /><p><strong>Name:</strong> ${user.fullName}</p> <p><strong>Email:</strong> ${user.email}</p>`);
-      const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
-      modal.show();
-  }
+        // Previous page link
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                          <span class="sr-only">Previous</span>
+                        </a>
+                      </li>`;
 
-  function handleEditModal(user) {
-      const modalTitle = $("#exampleModalLabel1");
-      modalTitle.text("Update user");
-      $("#fullName").val(user.fullName);
-      $("#email").val(user.email);
-      const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
-      modal.show();
+        // Page links
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHtml += `<li class="page-item ${currentPage === i ? 'active' : ''}">
+                          <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>`;
+        }
 
-      $("#updateButton").click(() => {
-          const fullName = $("#fullName").val();
-          const email = $("#email").val();
-          axios.post(`http://localhost:5000/update-user/${user._id}`, {
-              fullName: fullName,
-              email: email
-          })
-          .then(function (response) {
-              $("#toastResponse").text("✅ " + response.data.msg);
-              $("#toast").addClass('show');
-              setTimeout(() => {
-                  $("#toast").removeClass('show');
-              }, 1000);
-          })
-          .catch(function (error) {
-              console.log(error.response.data.check);
-              if (error.response.status === 304) {
-                  $("#toastResponse").text("❌ No changes. Try something different");
-                  $("#toast").addClass("show");
-                  setTimeout(() => {
-                      $("#toast").removeClass('show');
-                  }, 3000);
-              } else {
-                  console.error(error);
-              }
-          });
-      });
-  }
+        // Next page link
+        paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                          <span class="sr-only">Next</span>
+                        </a>
+                      </li>`;
 
-  function handleDeleteUser(user) {
-      axios.delete(`http://localhost:5000/delete-user/${user._id}`)
-          .then(function (response) {
-              if (response.status === 200) {
-                  $("#toastResponse").text("✅ " + response.data.msg);
-                  $("#toast").addClass("show");
-                  setTimeout(() => {
-                      $("#toast").removeClass('show');
-                  }, 3000);
-                  fetchAllUsers();
-              }
-          });
-  }
+        // Update pagination HTML
+        $('#pagination').html(paginationHtml);
+    }
 
-  // Fetch users when the page loads
-  fetchAllUsers();
+    // Event listener for pagination links
+    $(document).on('click', '.page-link', function (e) {
+        e.preventDefault();
+        const page = parseInt($(this).data('page'));
+        if (!isNaN(page)) {
+            fetchAllUsers(page);
+        }
+    });
+
+
+    function createTableLink(iconClass) {
+        const link = $("<a></a>").attr("href", "#").addClass("table-link");
+        const span = $("<span></span>").addClass("fa-stack");
+        const squareIcon = $("<i></i>").addClass("fa fa-square fa-stack-2x");
+        const actionIcon = $("<i></i>").addClass(`fa ${iconClass} fa-stack-1x fa-inverse`);
+        span.append(squareIcon, actionIcon);
+        link.append(span);
+        return link;
+    }
+
+    function displayUserDetails(user) {
+        const modalTitle = $("#exampleModalLabel");
+        modalTitle.text(user.fullName);
+
+        const modalBody = $(".modal-body");
+        modalBody.html(`<img src="./images/avatar.jpg" alt="profile pic" class="img-fluid w-25" /><p><strong>Name:</strong> ${user.fullName}</p> <p><strong>Email:</strong> ${user.email}</p>`);
+        const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+        modal.show();
+    }
+
+    function handleEditModal(user) {
+        const modalTitle = $("#exampleModalLabel1");
+        modalTitle.text("Update user");
+        $("#fullName").val(user.fullName);
+        $("#email").val(user.email);
+        const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        modal.show();
+
+        $("#updateButton").click(() => {
+            const fullName = $("#fullName").val();
+            const email = $("#email").val();
+            axios.post(`http://localhost:5000/update-user/${user._id}`, {
+                fullName: fullName,
+                email: email
+            })
+                .then(function (response) {
+                    $("#toastResponse").text("✅ " + response.data.msg);
+                    $("#toast").addClass('show');
+                    setTimeout(() => {
+                        $("#toast").removeClass('show');
+                    }, 1000);
+                })
+                .catch(function (error) {
+                    console.log(error.response.data.check);
+                    if (error.response.status === 304) {
+                        $("#toastResponse").text("❌ No changes. Try something different");
+                        $("#toast").addClass("show");
+                        setTimeout(() => {
+                            $("#toast").removeClass('show');
+                        }, 3000);
+                    } else {
+                        console.error(error);
+                    }
+                });
+        });
+    }
+
+    function handleDeleteUser(user) {
+        axios.delete(`http://localhost:5000/delete-user/${user._id}`)
+            .then(function (response) {
+                if (response.status === 200) {
+                    $("#toastResponse").text("✅ " + response.data.msg);
+                    $("#toast").addClass("show");
+                    setTimeout(() => {
+                        $("#toast").removeClass('show');
+                    }, 3000);
+                    fetchAllUsers();
+                }
+            });
+    }
+
+    // Fetch users when the page loads
+    fetchAllUsers();
+
+    // nav will fixed with animation after scrolling
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 100) {
+            $('nav').addClass('navFixedAnim')
+        } else {
+            $('nav').removeClass('navFixedAnim')
+        }
+    })
 });
+

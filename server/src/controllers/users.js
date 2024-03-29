@@ -68,7 +68,7 @@ const loginUser = async (req, res) => {
 //controllers for reset password
 const resetPassword = async (req, res) => {
     try {
-        const {resetCode, newPassword, confirmNewPassword } = req.body;
+        const { resetCode, newPassword, confirmNewPassword } = req.body;
 
         // Check if newPassword and confirmPassword match
         if (newPassword !== confirmNewPassword) {
@@ -150,9 +150,11 @@ const verifyEmail = async (req, res) => {
 //controller function to get all users
 const getAllUsers = async (req, res) => {
     try {
-        const allUsers = await User.find()
+        const count = await User.find().count();
+        const skipCount = (req.query.page - 1) * 5
+        const allUsers = await User.find().limit(5).skip(skipCount);
         // Send a success response
-        res.status(200).json({ allUsers, msg: "All users fetched successfully" });
+        res.status(200).json({ allUsers, count, msg: "All users fetched successfully" });
     } catch (err) {
         console.log(err)
         res.status(500).json({ msg: "Failed to get users" });
@@ -164,14 +166,14 @@ const getAllUsers = async (req, res) => {
 //controller function to update user by id
 const updateUserById = async (req, res) => {
     try {
-        const {fullName, email}=req.body
-        const {uId}= req.params
-        const userDetails= await User.findById(uId)
-        if(userDetails.fullName===fullName && userDetails.email===email){
+        const { fullName, email } = req.body
+        const { uId } = req.params
+        const userDetails = await User.findById(uId)
+        if (userDetails.fullName === fullName && userDetails.email === email) {
             res.status(304).json({ msg: "No information changed. please write different" });
-        }else{
-            userDetails.fullName=fullName
-            userDetails.email=email
+        } else {
+            userDetails.fullName = fullName
+            userDetails.email = email
             userDetails.save()
             // Send a success response
             res.status(200).json({ msg: "User updated successfully" });
