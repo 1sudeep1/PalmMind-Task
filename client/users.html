@@ -52,9 +52,9 @@
   <!-- display userlist section start -->
   <div class="container">
     <div class="d-flex justify-content-center">
-      <div class="toast" id="toast">
+      <div class="toast toastModal" id="toast">
         <div class="toast-body">
-          <span id="deleteResponse"></span>
+          <span id="toastResponse"></span>
         </div>
       </div>
     </div>
@@ -81,6 +81,42 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel1"
+                  aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5 ms-auto" id="exampleModalLabel1">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form class="mx-1 mx-md-4" id="registrationForm">
+                          <div class="d-flex flex-row align-items-center mb-4">
+                            <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                            <div class="form-outline flex-fill mb-0 text-start">
+                              <label class="form-label" for="fullName">Full Name</label><span
+                                class="ms-1 text-danger">*</span>
+                              <input type="text" id="fullName" class="form-control" placeholder="enter your full name" />
+                            </div>
+                          </div>
+      
+                          <div class="d-flex flex-row align-items-center mb-4">
+                            <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                            <div class="form-outline flex-fill mb-0 text-start">
+                              <label class="form-label" for="email">Your Email</label><span class="ms-1 text-danger">*</span>
+                              <input type="email" id="email" class="form-control" placeholder="enter your valid email" />
+                            </div>
+                          </div>
+      
+                          <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                            <button id="updateButton" type="button" class="btn btn-primary btn-md">Update</button>
+                          </div>
+                        </form>
                       </div>
                     </div>
                   </div>
@@ -202,6 +238,7 @@
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://kit.fontawesome.com/ad220e7578.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-hot-toast@2.4.1/dist/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -248,6 +285,9 @@
           searchLink.addEventListener("click", function () {
             displayUserDetails(user)
           })
+          editLink.addEventListener("click", function () {
+            handleEditModal(user)
+          })
           deleteLink.addEventListener("click", function () {
             handleDeleteUser(user)
           })
@@ -290,13 +330,57 @@
         modal.show();
       }
 
+        //this function will set value to modal
+        function handleEditModal(user) {
+        const modalTitle = document.querySelector("#exampleModalLabel1");
+        modalTitle.textContent = "Update user";
+        document.getElementById("fullName").value=user.fullName
+        document.getElementById("email").value=user.email
+        const modal = new bootstrap.Modal(document.getElementById('exampleModal1'));
+        modal.show();
+      
+
+      //function to handle edit user
+      document.getElementById("updateButton").addEventListener("click", function(){
+        const fullName= document.getElementById("fullName").value
+        const email= document.getElementById("email").value
+        axios.post(`http://localhost:5000/update-user/${user._id}`, {
+          fullName:fullName,
+          email:email
+        })
+        .then(function (response) {
+            //Handle successfull edit
+            document.getElementById("toastResponse").innerText = "✅ " + response.data.msg;
+            document.getElementById("toast").classList.add('show');
+            setTimeout(function () {
+              document.getElementById("toast").classList.remove('show')
+            }, 1000)
+          })
+          .catch(function (error) {
+            console.log(error.response.data.check)
+            if (error.response.status === 304) {
+              document.getElementById("toastResponse").innerText = "❌ No changes.Try something different"
+              document.getElementById("toast").classList.add("show");
+              setTimeout(function () {
+                document.getElementById("toast").classList.remove('show');
+              }, 3000);
+            }else{
+              // Handle registration error
+              // alert("Registration failed. Please try again.");
+              console.error(error);
+            }
+
+          });
+      })
+    }
+
       //this function will delete the user
       function handleDeleteUser(user) {
         console.log(user._id)
         axios.delete(`http://localhost:5000/delete-user/${user._id}`)
           .then(function (response) {
             if (response.status === 200) {
-              document.getElementById("deleteResponse").innerText = "✅ " + response.data.msg;
+              document.getElementById("toastResponse").innerText = "✅ " + response.data.msg;
               document.getElementById("toast").classList.add("show")
               setTimeout(function () {
                 document.getElementById("toast").classList.remove('show')

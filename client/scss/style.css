@@ -74,7 +74,14 @@ tr:hover a {
 .fa-stack {
   font-size: small !important;
 }
+.fa-stack:hover {
+  color: red;
+}
 
 .fade {
   background-color: rgba(135, 135, 135, 0.3960784314) !important;
+}
+
+.toastModal {
+  z-index: 99999999 !important;
 }/*# sourceMappingURL=style.css.map */

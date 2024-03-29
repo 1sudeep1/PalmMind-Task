@@ -159,6 +159,29 @@ const getAllUsers = async (req, res) => {
     }
 }
 
+
+
+//controller function to update user by id
+const updateUserById = async (req, res) => {
+    try {
+        const {fullName, email}=req.body
+        const {uId}= req.params
+        const userDetails= await User.findById(uId)
+        if(userDetails.fullName===fullName && userDetails.email===email){
+            res.status(304).json({ msg: "No information changed. please write different" });
+        }else{
+            userDetails.fullName=fullName
+            userDetails.email=email
+            userDetails.save()
+            // Send a success response
+            res.status(200).json({ msg: "User updated successfully" });
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: "Failed to update user" });
+    }
+}
+
 //controller function to delete user by id
 const deleteUserById = async (req, res) => {
     try {
@@ -171,4 +194,4 @@ const deleteUserById = async (req, res) => {
     }
 }
 
-module.exports = { registerUser, loginUser, resetPassword, getAllUsers, verifyEmail, deleteUserById };
+module.exports = { registerUser, loginUser, resetPassword, getAllUsers, verifyEmail, deleteUserById, updateUserById };
